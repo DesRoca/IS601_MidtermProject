@@ -320,41 +320,41 @@ class IntegerDivision(Operation):
         self.validate_operands(a, b)
         return a // b
 
-    
+
 class Percentage(Operation):
     """
     Percentage operation implementation.
 
-    Calculates the percentage of one number relative to another.
+    Calculates what percentage one number is of another.
     """
 
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
         """
         Validate operands for percentage operation.
 
-        Overrides the base class method to ensure that the base value is not zero.
+        Overrides the base class method to ensure that the denominator is not zero.
 
         Args:
-            a (Decimal): Base value.
-            b (Decimal): Percentage value.
+            a (Decimal): Numerator.
+            b (Decimal): Denominator.
         """
         super().validate_operands(a, b)
-        if a == 0:
-            raise ValidationError("Base value cannot be zero for percentage calculation")
+        if b == 0:
+            raise ValidationError("Denominator cannot be zero for percentage calculation")
 
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """
-        Calculate the percentage of one number relative to another.
+        Calculate what percentage one number is of another.
 
         Args:
-            a (Decimal): Base value.
-            b (Decimal): Percentage value.
+            a (Decimal): Numerator.
+            b (Decimal): Denominator.
 
         Returns:
-            Decimal: Result of the percentage calculation.
+            Decimal: Percentage result.
         """
         self.validate_operands(a, b)
-        return (a * b) / 100
+        return (a / b) * Decimal("100")
 
 
 class AbsoluteDifference(Operation):

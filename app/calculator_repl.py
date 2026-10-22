@@ -139,7 +139,7 @@ def calculator_repl():
 
                         # Normalize the result if it's a Decimal
                         if isinstance(result, Decimal):
-                            result = result.normalize()
+                            result = format(result.normalize(), 'f')
 
                         print(f"\nResult: {result}")
                     except (ValidationError, OperationError) as e:
