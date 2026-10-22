@@ -2,6 +2,7 @@ import datetime
 from pathlib import Path
 import pandas as pd
 import pytest
+import re
 from unittest.mock import Mock, patch, PropertyMock
 from decimal import Decimal
 from tempfile import TemporaryDirectory
@@ -35,6 +36,22 @@ def calculator():
             
             # Return an instance of Calculator with the mocked config
             yield Calculator(config=config)
+
+# Helper function to assert printed output while ignoring ANSI color codes
+def assert_printed(mock_print, expected_output):
+    """
+    Check printed output while ignoring ANSI color codes.
+    """
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+
+    printed_outputs = [
+        ansi_escape.sub('', str(call.args[0]))
+        for call in mock_print.call_args_list
+        if call.args
+    ]
+
+    assert expected_output in printed_outputs
+
 
 # Test Calculator Initialization
 
@@ -368,22 +385,22 @@ def test_calculator_repl_exit(mock_print, mock_input):
     with patch('app.calculator.Calculator.save_history') as mock_save_history:
         calculator_repl()
         mock_save_history.assert_called_once()
-        mock_print.assert_any_call("History saved successfully.")
-        mock_print.assert_any_call("Goodbye!")
+        assert_printed(mock_print, "History saved successfully.")
+        assert_printed(mock_print, "Goodbye!")
 
 
 @patch('builtins.input', side_effect=['help', 'exit'])
 @patch('builtins.print')
 def test_calculator_repl_help(mock_print, mock_input):
     calculator_repl()
-    mock_print.assert_any_call("\nAvailable commands:")
+    assert_printed(mock_print, "\nAvailable commands:")
 
 
 @patch('builtins.input', side_effect=['add', '2', '3', 'exit'])
 @patch('builtins.print')
 def test_calculator_repl_addition(mock_print, mock_input):
     calculator_repl()
-    mock_print.assert_any_call("\nResult: 5")
+    assert_printed(mock_print, "\nResult: 5")
 
 
 def _run_repl_with_calculator(inputs, calculator_mock):
@@ -400,8 +417,8 @@ def test_repl_exit_saves_history_failure():
 
     mock_print = _run_repl_with_calculator(['exit'], calculator_mock)
 
-    mock_print.assert_any_call('Warning: Could not save history: save failed')
-    mock_print.assert_any_call('Goodbye!')
+    assert_printed(mock_print, 'Warning: Could not save history: save failed')
+    assert_printed(mock_print, 'Goodbye!')
 
 
 @pytest.mark.parametrize(
@@ -420,7 +437,7 @@ def test_repl_history_and_last_commands(command, history, expected_output):
 
     mock_print = _run_repl_with_calculator([command, 'exit'], calculator_mock)
 
-    mock_print.assert_any_call(expected_output)
+    assert_printed(mock_print, expected_output)
 
 
 def test_repl_clear_command():
@@ -429,7 +446,7 @@ def test_repl_clear_command():
     mock_print = _run_repl_with_calculator(['clear', 'exit'], calculator_mock)
 
     calculator_mock.clear_history.assert_called_once_with()
-    mock_print.assert_any_call('History cleared')
+    assert_printed(mock_print, 'History cleared')
 
 
 @pytest.mark.parametrize(
@@ -447,7 +464,7 @@ def test_repl_undo_and_redo_commands(command, method_result, expected_output):
 
     mock_print = _run_repl_with_calculator([command, 'exit'], calculator_mock)
 
-    mock_print.assert_any_call(expected_output)
+    assert_printed(mock_print, expected_output)
 
 
 @pytest.mark.parametrize('command', ['save', 'load'])
@@ -461,7 +478,7 @@ def test_repl_history_persistence_commands(command):
 
     mock_print = _run_repl_with_calculator([command, 'exit'], calculator_mock)
 
-    mock_print.assert_any_call(success_message)
+    assert_printed(mock_print, success_message)
 
 
 @pytest.mark.parametrize(
@@ -477,7 +494,7 @@ def test_repl_history_persistence_errors(command, method_name, error_message):
 
     mock_print = _run_repl_with_calculator([command, 'exit'], calculator_mock)
 
-    mock_print.assert_any_call(error_message)
+    assert_printed(mock_print, error_message)
 
 
 @pytest.mark.parametrize('cancel_input', [['cancel', '2'], ['2', 'cancel']])
@@ -488,7 +505,7 @@ def test_repl_operation_cancellation(cancel_input):
     mock_print = _run_repl_with_calculator(inputs, calculator_mock)
 
     calculator_mock.perform_operation.assert_not_called()
-    mock_print.assert_any_call('Operation cancelled')
+    assert_printed(mock_print, 'Operation cancelled')
 
 
 @pytest.mark.parametrize(
@@ -508,7 +525,7 @@ def test_repl_operation_errors(exception_type, expected_message):
 
     mock_print = _run_repl_with_calculator(['add', '2', '3', 'exit'], calculator_mock)
 
-    mock_print.assert_any_call(expected_message)
+    assert_printed(mock_print, expected_message)
 
 
 def test_repl_unknown_command():
@@ -516,9 +533,7 @@ def test_repl_unknown_command():
 
     mock_print = _run_repl_with_calculator(['unknown', 'exit'], calculator_mock)
 
-    mock_print.assert_any_call(
-        "Unknown command: 'unknown'. Type 'help' for available commands."
-    )
+    assert_printed(mock_print, "Unknown command: 'unknown'. Type 'help' for available commands.")
 
 
 @pytest.mark.parametrize(
@@ -537,7 +552,7 @@ def test_repl_input_error_handling(input_exception, expected_message):
 
     mock_print = _run_repl_with_calculator(inputs, calculator_mock)
 
-    mock_print.assert_any_call(expected_message)
+    assert_printed(mock_print, expected_message)
 
 
 def test_repl_fatal_initialization_error():
@@ -547,7 +562,7 @@ def test_repl_fatal_initialization_error():
         with pytest.raises(RuntimeError, match='startup failed'):
             calculator_repl()
 
-    mock_print.assert_any_call('Fatal error: startup failed')
+    assert_printed(mock_print, 'Fatal error: startup failed')
     mock_logging_error.assert_called_once_with(
         'Fatal error in calculator REPL: startup failed'
     )
