@@ -14,6 +14,13 @@ from app.operations import OperationFactory
 
 init(autoreset=True)  # Initialize colorama for colored output
 
+# Define colors for REPL messages
+INFO_COLOR = Fore.CYAN
+PROMPT_COLOR = Fore.LIGHTMAGENTA_EX
+SUCCESS_COLOR = Fore.GREEN
+WARNING_COLOR = Fore.YELLOW
+ERROR_COLOR = Fore.RED
+
 
 def calculator_repl():
     """
@@ -30,108 +37,108 @@ def calculator_repl():
         calc.add_observer(LoggingObserver())
         calc.add_observer(AutoSaveObserver(calc))
 
-        print(Fore.CYAN + "Calculator started. Type 'help' for commands.")
+        print(INFO_COLOR + "Calculator started. Type 'help' for commands.")
 
         while True:
             try:
                 # Prompt the user for a command
-                command = input(Fore.LIGHTMAGENTA_EX + "\nEnter command: ").lower().strip()
+                command = input(PROMPT_COLOR + "\nEnter command: ").lower().strip()
 
                 if command == 'help':
                     # Display available commands
-                    print(Fore.CYAN + "\nAvailable commands:")
-                    print(Fore.CYAN + "  add, subtract, multiply, divide, power, root, modulus, percent, int_divide, abs_diff - Perform calculations")
-                    print(Fore.CYAN + "  history - Show calculation history")
-                    print(Fore.CYAN + "  last - Show the last calculation performed")
-                    print(Fore.CYAN + "  clear - Clear calculation history")
-                    print(Fore.CYAN + "  undo - Undo the last calculation")
-                    print(Fore.CYAN + "  redo - Redo the last undone calculation")
-                    print(Fore.CYAN + "  save - Save calculation history to file")
-                    print(Fore.CYAN + "  load - Load calculation history from file")
-                    print(Fore.CYAN + "  exit - Exit the calculator")
+                    print(INFO_COLOR + "\nAvailable commands:")
+                    print(INFO_COLOR + "  add, subtract, multiply, divide, power, root, modulus, percent, int_divide, abs_diff - Perform calculations")
+                    print(INFO_COLOR + "  history - Show calculation history")
+                    print(INFO_COLOR + "  last - Show the last calculation performed")
+                    print(INFO_COLOR + "  clear - Clear calculation history")
+                    print(INFO_COLOR + "  undo - Undo the last calculation")
+                    print(INFO_COLOR + "  redo - Redo the last undone calculation")
+                    print(INFO_COLOR + "  save - Save calculation history to file")
+                    print(INFO_COLOR + "  load - Load calculation history from file")
+                    print(INFO_COLOR + "  exit - Exit the calculator")
                     continue
 
                 if command == 'exit':
                     # Attempt to save history before exiting
                     try:
                         calc.save_history()
-                        print(Fore.GREEN + "History saved successfully.")
+                        print(SUCCESS_COLOR + "History saved successfully.")
                     except Exception as e:
-                        print(Fore.YELLOW + f"Warning: Could not save history: {e}")
-                    print(Fore.LIGHTMAGENTA_EX + "Goodbye!")
+                        print(WARNING_COLOR + f"Warning: Could not save history: {e}")
+                    print(PROMPT_COLOR + "Goodbye!")
                     break
 
                 if command == 'history':
                     # Display calculation history
                     history = calc.show_history()
                     if not history:
-                        print(Fore.YELLOW + "No calculations in history")
+                        print(WARNING_COLOR + "No calculations in history")
                     else:
-                        print(Fore.LIGHTMAGENTA_EX + "\nCalculation History:")
+                        print(PROMPT_COLOR + "\nCalculation History:")
                         for i, entry in enumerate(history, 1):
-                            print(Fore.LIGHTMAGENTA_EX + f"{i}. {entry}")
+                            print(PROMPT_COLOR + f"{i}. {entry}")
                     continue
 
                 if command == 'last':
                     # Show the last calculation performed
                     last_calc = calc.last_calculation()
                     if last_calc:
-                        print(Fore.LIGHTMAGENTA_EX + f"Last Calculation: {last_calc}")
+                        print(PROMPT_COLOR + f"Last Calculation: {last_calc}")
                     else:
-                        print(Fore.YELLOW + "No calculations have been performed yet.")
+                        print(WARNING_COLOR + "No calculations have been performed yet.")
                     continue
 
                 if command == 'clear':
                     # Clear calculation history
                     calc.clear_history()
-                    print(Fore.GREEN + "History cleared")
+                    print(SUCCESS_COLOR + "History cleared")
                     continue
 
                 if command == 'undo':
                     # Undo the last calculation
                     if calc.undo():
-                        print(Fore.GREEN + "Operation undone")
+                        print(SUCCESS_COLOR + "Operation undone")
                     else:
-                        print(Fore.YELLOW + "Nothing to undo")
+                        print(WARNING_COLOR + "Nothing to undo")
                     continue
 
                 if command == 'redo':
                     # Redo the last undone calculation
                     if calc.redo():
-                        print(Fore.GREEN + "Operation redone")
+                        print(SUCCESS_COLOR + "Operation redone")
                     else:
-                        print(Fore.YELLOW + "Nothing to redo")
+                        print(WARNING_COLOR + "Nothing to redo")
                     continue
 
                 if command == 'save':
                     # Save calculation history to file
                     try:
                         calc.save_history()
-                        print(Fore.GREEN + "History saved successfully")
+                        print(SUCCESS_COLOR + "History saved successfully")
                     except Exception as e:
-                        print(Fore.RED + f"Error saving history: {e}")
+                        print(ERROR_COLOR + f"Error saving history: {e}")
                     continue
 
                 if command == 'load':
                     # Load calculation history from file
                     try:
                         calc.load_history()
-                        print(Fore.GREEN + "History loaded successfully")
+                        print(SUCCESS_COLOR + "History loaded successfully")
                     except Exception as e:
-                        print(Fore.RED + f"Error loading history: {e}")
+                        print(ERROR_COLOR + f"Error loading history: {e}")
                     continue
 
                 if command in ['add', 'subtract', 'multiply', 'divide', 'power', 'root', 'modulus', 'percent', 'int_divide', 'abs_diff']:
                     # Perform the specified arithmetic operation
                     try:
-                        print(Fore.LIGHTMAGENTA_EX + "\nEnter numbers (or 'cancel' to abort):")
+                        print(PROMPT_COLOR + "\nEnter numbers (or 'cancel' to abort):")
                         a = input("First number: ")
                         if a.lower() == 'cancel':
-                            print(Fore.YELLOW + "Operation cancelled")
+                            print(WARNING_COLOR + "Operation cancelled")
                             continue
                         b = input("Second number: ")
                         if b.lower() == 'cancel':
-                            print(Fore.YELLOW + "Operation cancelled")
+                            print(WARNING_COLOR + "Operation cancelled")
                             continue
 
                         # Create the appropriate operation instance using the Factory pattern
@@ -145,33 +152,33 @@ def calculator_repl():
                         if isinstance(result, Decimal):
                             result = format(result.normalize(), 'f')
 
-                        print(Fore.GREEN + f"\nResult: {result}")
+                        print(SUCCESS_COLOR + f"\nResult: {result}")
                     except (ValidationError, OperationError) as e:
                         # Handle known exceptions related to validation or operation errors
-                        print(Fore.RED + f"Error: {e}")
+                        print(ERROR_COLOR + f"Error: {e}")
                     except Exception as e:
                         # Handle any unexpected exceptions
-                        print(Fore.RED + f"Unexpected error: {e}")
+                        print(ERROR_COLOR + f"Unexpected error: {e}")
                     continue
 
                 # Handle unknown commands
-                print(Fore.RED + f"Unknown command: '{command}'. Type 'help' for available commands.")
+                print(ERROR_COLOR + f"Unknown command: '{command}'. Type 'help' for available commands.")
 
             except KeyboardInterrupt:
                 # Handle Ctrl+C interruption gracefully
-                print(Fore.YELLOW + "\nOperation cancelled")
+                print(WARNING_COLOR + "\nOperation cancelled")
                 continue
             except EOFError:
                 # Handle end-of-file (e.g., Ctrl+D) gracefully
-                print(Fore.YELLOW + "\nInput terminated. Exiting...")
+                print(WARNING_COLOR + "\nInput terminated. Exiting...")
                 break
             except Exception as e:
                 # Handle any other unexpected exceptions
-                print(Fore.RED + f"Error: {e}")
+                print(ERROR_COLOR + f"Error: {e}")
                 continue
 
     except Exception as e:
         # Handle fatal errors during initialization
-        print(Fore.RED + f"Fatal error: {e}")
+        print(ERROR_COLOR + f"Fatal error: {e}")
         logging.error(f"Fatal error in calculator REPL: {e}")
         raise
