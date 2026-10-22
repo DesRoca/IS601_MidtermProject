@@ -249,6 +249,136 @@ class Root(Operation):
         return Decimal(pow(float(a), 1 / float(b)))
 
 
+class Modulus(Operation):
+    """
+    Modulus operation implementation.
+
+    Calculates the remainder of the division of one number by another.
+    """
+
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        """
+        Validate operands for modulus operation.
+
+        Overrides the base class method to ensure that the divisor is not zero.
+
+        Args:
+            a (Decimal): Dividend.
+            b (Decimal): Divisor.
+        """
+        super().validate_operands(a, b)
+        if b == 0:
+            raise ValidationError("Divisor cannot be zero")
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        """
+        Calculate the modulus of one number by another.
+
+        Args:
+            a (Decimal): Dividend.
+            b (Decimal): Divisor.
+
+        Returns:
+            Decimal: Remainder of the division.
+        """
+        self.validate_operands(a, b)
+        return a % b
+
+
+class IntegerDivision(Operation):
+    """
+    Integer Division operation implementation.
+
+    Performs floor division of one number by another.
+    """
+
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        """
+        Validate operands for integer division operation.
+
+        Overrides the base class method to ensure that the divisor is not zero.
+
+        Args:
+            a (Decimal): Dividend.
+            b (Decimal): Divisor.
+        """
+        super().validate_operands(a, b)
+        if b == 0:
+            raise ValidationError("Divisor cannot be zero")
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        """
+        Perform integer division of one number by another.
+
+        Args:
+            a (Decimal): Dividend.
+            b (Decimal): Divisor.
+
+        Returns:
+            Decimal: Result of the integer division.
+        """
+        self.validate_operands(a, b)
+        return a // b
+
+    
+class Percentage(Operation):
+    """
+    Percentage operation implementation.
+
+    Calculates the percentage of one number relative to another.
+    """
+
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        """
+        Validate operands for percentage operation.
+
+        Overrides the base class method to ensure that the base value is not zero.
+
+        Args:
+            a (Decimal): Base value.
+            b (Decimal): Percentage value.
+        """
+        super().validate_operands(a, b)
+        if a == 0:
+            raise ValidationError("Base value cannot be zero for percentage calculation")
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        """
+        Calculate the percentage of one number relative to another.
+
+        Args:
+            a (Decimal): Base value.
+            b (Decimal): Percentage value.
+
+        Returns:
+            Decimal: Result of the percentage calculation.
+        """
+        self.validate_operands(a, b)
+        return (a * b) / 100
+
+
+class AbsoluteDifference(Operation):
+    """
+    Absolute Difference operation implementation.
+
+    Calculates the absolute difference between two numbers.
+    """
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        """
+        Calculate the absolute difference between two numbers.
+
+        Args:
+            a (Decimal): First operand.
+            b (Decimal): Second operand.
+
+        Returns:
+            Decimal: Absolute difference between the two operands.
+        """
+        self.validate_operands(a, b)
+        return abs(a - b)
+
+
 class OperationFactory:
     """
     Factory class for creating operation instances.
@@ -265,7 +395,11 @@ class OperationFactory:
         'multiply': Multiplication,
         'divide': Division,
         'power': Power,
-        'root': Root
+        'root': Root,
+        'modulus': Modulus,
+        'percentage': Percentage,
+        'int_divide': IntegerDivision,
+        'abs_diff': AbsoluteDifference
     }
 
     @classmethod
