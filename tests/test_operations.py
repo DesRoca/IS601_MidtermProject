@@ -11,6 +11,10 @@ from app.operations import (
     Division,
     Power,
     Root,
+    Modulus,
+    Percentage,
+    IntegerDivision,
+    AbsoluteDifference,
     OperationFactory,
 )
 
@@ -182,6 +186,78 @@ class TestRoot(BaseOperationTest):
     }
 
 
+class TestModulus(BaseOperationTest):
+    """Test Modulus operation."""
+
+    operation_class = Modulus
+    valid_test_cases = {
+        "positive_numbers": {"a": "10", "b": "3", "expected": "1"},
+        "negative_dividend": {"a": "-10", "b": "3", "expected": "-1"},
+        "negative_divisor": {"a": "10", "b": "-3", "expected": "1"},
+        "both_negative": {"a": "-10", "b": "-3", "expected": "-1"},
+    }
+    invalid_test_cases = {
+        "divide_by_zero": {
+            "a": "10",
+            "b": "0",
+            "error": ValidationError,
+            "message": "Divisor cannot be zero"
+        },
+    }
+
+
+class TestPercentage(BaseOperationTest):
+    """Test Percentage operation."""
+
+    operation_class = Percentage
+    valid_test_cases = {
+        "simple_percentage": {"a": "200", "b": "10", "expected": "2000"},
+        "zero_numerator": {"a": "0", "b": "10", "expected": "0"},
+        "decimal_percentage": {"a": "200", "b": "12.5", "expected": "1600"},
+    }
+    invalid_test_cases = {
+        "zero_denominator": {
+        "a": "200",
+        "b": "0",
+        "error": ValidationError,
+        "message": "Denominator cannot be zero for percentage calculation",
+        },
+    }
+
+
+class TestIntegerDivision(BaseOperationTest):
+    """Test Integer Division operation."""
+
+    operation_class = IntegerDivision
+    valid_test_cases = {
+        "positive_numbers": {"a": "10", "b": "3", "expected": "3"},
+        "negative_dividend": {"a": "-10", "b": "3", "expected": "-3"},
+        "negative_divisor": {"a": "10", "b": "-3", "expected": "-3"},
+        "both_negative": {"a": "-10", "b": "-3", "expected": "3"},
+    }
+    invalid_test_cases = {
+        "divide_by_zero": {
+            "a": "10",
+            "b": "0",
+            "error": ValidationError,
+            "message": "Divisor cannot be zero"
+        },
+    }
+
+
+class TestAbsoluteDifference(BaseOperationTest):
+    """Test Absolute Difference operation."""
+
+    operation_class = AbsoluteDifference
+    valid_test_cases = {
+        "positive_numbers": {"a": "10", "b": "3", "expected": "7"},
+        "negative_numbers": {"a": "-10", "b": "-3", "expected": "7"},
+        "mixed_signs": {"a": "-10", "b": "3", "expected": "13"},
+        "zero_difference": {"a": "5", "b": "5", "expected": "0"},
+    }
+    invalid_test_cases = {}  # Absolute Difference has no invalid cases
+
+
 class TestOperationFactory:
     """Test OperationFactory functionality."""
 
@@ -194,6 +270,10 @@ class TestOperationFactory:
             'divide': Division,
             'power': Power,
             'root': Root,
+            'modulus': Modulus,
+            'percent': Percentage,
+            'int_divide': IntegerDivision,
+            'abs_diff': AbsoluteDifference,
         }
 
         for op_name, op_class in operation_map.items():
