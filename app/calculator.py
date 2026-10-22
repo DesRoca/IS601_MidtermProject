@@ -16,6 +16,7 @@ from app.calculator_memento import CalculatorMemento
 from app.exceptions import OperationError, ValidationError
 from app.history import HistoryObserver
 from app.input_validators import InputValidator
+from app.logger import setup_logger
 from app.operations import Operation
 
 # Type aliases for better readability
@@ -87,23 +88,7 @@ class Calculator:
 
         Sets up logging to a file with a specified format and log level.
         """
-        try:
-            # Ensure the log directory exists
-            os.makedirs(self.config.log_dir, exist_ok=True)
-            log_file = self.config.log_file.resolve()
-
-            # Configure the basic logging settings
-            logging.basicConfig(
-                filename=str(log_file),
-                level=logging.INFO,
-                format='%(asctime)s - %(levelname)s - %(message)s',
-                force=True  # Overwrite any existing logging configuration
-            )
-            logging.info(f"Logging initialized at: {log_file}")
-        except Exception as e:
-            # Print an error message and re-raise the exception if logging setup fails
-            print(f"Error setting up logging: {e}")
-            raise
+        setup_logger(self.config.log_file)
 
     def _setup_directories(self) -> None:
         """
