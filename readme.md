@@ -1,264 +1,210 @@
-# 📦 Project Setup
+# IS601 Midterm Project: Enhanced Calculator Command-Line Application
 
----
+## Objective
 
-# 🧩 1. Install Homebrew (Mac Only)
+This assignment focuses on building an advanced calculator application with various arithmetic operations, a command-line interface (REPL), and robust error handling. You'll use several design patterns (Factory, Memento, Observer) and implement features like undo/redo, logging, history management, and CI/CD pipelines. Additionally, you'll enhance the application with optional advanced features.
 
-> Skip this step if you're on Windows.
+## Features
 
-Homebrew is a package manager for macOS.  
-You’ll use it to easily install Git, Python, Docker, etc.
+- **Arithmetic operations:** Addition, subtraction, multiplication, and division.
+- **Additional operations:** Power, root, modulus, integer division, percentage calculation, and absolute difference.
+- **Command-line interface:** Interactive REPL (Read-Eval-Print Loop) with color-coded output using Colorama.
+- **Input validation and error handling:** Validates numerical inputs and handles invalid operations, division by zero, and other errors.
+- **Calculation history:** Stores calculation results and timestamps and supports saving and loading history using CSV files.
+- **Undo and redo:** Allows users to undo previous calculations and restore undone calculations.
+- **Logging:** Records application events and calculation activity in a log file.
+- **Automatic saving:** Supports automatically saving calculation history when new calculations are performed.
+- **Configuration management:** Uses environment variables and a `.env` file to configure application settings.
+- **Unit testing:** Uses pytest and pytest-cov to test functionality and measure code coverage.
+- **Continuous integration:** Uses GitHub Actions to run automated tests and enforce a minimum coverage requirement.
 
-**Install Homebrew:**
+## Technologies Used
 
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
+- Python
+- pytest and pytest-cov
+- pandas
+- Colorama
+- python-dotenv
+- Git and GitHub Actions
 
-**Verify Homebrew:**
+## Installation Instructions
 
-```bash
-brew --version
-```
+### 1. Clone the repository
 
-If you see a version number, you're good to go.
-
----
-
-# 🧩 2. Install and Configure Git
-
-## Install Git
-
-- **MacOS (using Homebrew)**
-
-```bash
-brew install git
-```
-
-- **Windows**
-
-Download and install [Git for Windows](https://git-scm.com/download/win).  
-Accept the default options during installation.
-
-**Verify Git:**
+Clone the repository and navigate to the project directory:
 
 ```bash
-git --version
+git clone git@github.com:DesRoca/IS601_MidtermProject.git
+cd IS601_MidtermProject
 ```
 
----
+### 2. Create a virtual environment
 
-## Configure Git Globals
-
-Set your name and email so Git tracks your commits properly:
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your_email@example.com"
-```
-
-Confirm the settings:
-
-```bash
-git config --list
-```
-
----
-
-## Generate SSH Keys and Connect to GitHub
-
-> Only do this once per machine.
-
-1. Generate a new SSH key:
-
-```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
-```
-
-(Press Enter at all prompts.)
-
-2. Start the SSH agent:
-
-```bash
-eval "$(ssh-agent -s)"
-```
-
-3. Add the SSH private key to the agent:
-
-```bash
-ssh-add ~/.ssh/id_ed25519
-```
-
-4. Copy your SSH public key:
-
-- **Mac/Linux:**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | pbcopy
-```
-
-- **Windows (Git Bash):**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | clip
-```
-
-5. Add the key to your GitHub account:
-   - Go to [GitHub SSH Settings](https://github.com/settings/keys)
-   - Click **New SSH Key**, paste the key, save.
-
-6. Test the connection:
-
-```bash
-ssh -T git@github.com
-```
-
-You should see a success message.
-
----
-
-# 🧩 3. Clone the Repository
-
-Now you can safely clone the course project:
-
-```bash
-git clone <repository-url>
-cd <repository-directory>
-```
-
----
-
-# 🛠️ 4. Install Python 3.10+
-
-## Install Python
-
-- **MacOS (Homebrew)**
-
-```bash
-brew install python
-```
-
-- **Windows**
-
-Download and install [Python for Windows](https://www.python.org/downloads/).  
-✅ Make sure you **check the box** `Add Python to PATH` during setup.
-
-**Verify Python:**
-
-```bash
-python3 --version
-```
-or
-```bash
-python --version
-```
-
----
-
-## Create and Activate a Virtual Environment
-
-(Optional but recommended)
+Create a Python virtual environment:
 
 ```bash
 python3 -m venv venv
-source venv/bin/activate   # Mac/Linux
-venv\Scripts\activate.bat  # Windows
 ```
 
-### Install Required Packages
+Activate the virtual environment on macOS or Linux:
 
 ```bash
+source venv/bin/activate
+```
+
+### 3. Install dependencies
+
+Upgrade pip and install the project dependencies:
+
+```bash
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
----
+Make sure the virtual environment is activated before installing dependencies or running the application.
 
-# 🐳 5. (Optional) Docker Setup
+## Configuration Setup
 
-> Skip if Docker isn't used in this module.
+The application uses a `.env` file to manage configuration settings. This allows users to customize application behavior without modifying the source code.
 
-## Install Docker
+### 1. Create the `.env` file
 
-- [Install Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/)
-- [Install Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-
-## Build Docker Image
+Create a file named `.env` in the project root directory, alongside `main.py`.
 
 ```bash
-docker build -t <image-name> .
+touch .env
 ```
 
-## Run Docker Container
+### 2. Configure environment variables
+
+The following variables are used for configuring the application. The application can use default values when optional settings are not provided.
+
+```dotenv
+CALCULATOR_MAX_HISTORY_SIZE=100
+CALCULATOR_AUTO_SAVE=true
+CALCULATOR_DEFAULT_ENCODING=utf-8
+```
+These variables control the calculator's configuration:
+
+CALCULATOR_MAX_HISTORY_SIZE: Sets the maximum number of calculations retained in history.
+CALCULATOR_AUTO_SAVE: Enables or disables automatic saving of calculation history.
+CALCULATOR_DEFAULT_ENCODING: Specifies the default character encoding used for file operations.
+
+You can adjust these values to suit your needs. Make sure the values follow the expected formats for each setting.
+
+### 3. Protect the `.env` file
+
+The `.env` file contains local configuration and should not be committed to version control.
+
+Add the following entries to `.gitignore` if they are not already present:
+
+```gitignore
+.env
+venv/
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+logs/
+```
+
+The application can create the log and history directories automatically when needed.
+
+## Usage Guide
+
+### Starting the application
+
+Run the calculator from the project root directory:
 
 ```bash
-docker run -it --rm <image-name>
+python3 main.py
 ```
 
----
+The calculator starts an interactive command-line interface. Enter a supported command to perform an operation or manage calculation history.
 
-# 🚀 6. Running the Project
+### Calculation commands
 
-- **Without Docker**:
+The calculator supports the following operations:
+
+| Command | Description | Example |
+|---|---|---|
+| `add` | Adds two numbers | `add 5 3` |
+| `subtract` | Subtracts the second number from the first | `subtract 5 3` |
+| `multiply` | Multiplies two numbers | `multiply 5 3` |
+| `divide` | Divides the first number by the second | `divide 6 2` |
+| `power` | Raises the first number to the power of the second | `power 2 3` |
+| `root` | Calculates the nth root of the first number, using the second as the root degree | `root 27 3` |
+| `modulus` | Calculates the remainder | `modulus 10 3` |
+| `int_divide` | Performs integer division | `int_divide 10 3` |
+| `percent` | Calculates what percentage the first number is of the second | `percent 25 100` |
+| `abs_diff` | Calculates the absolute difference between two numbers | `abs_diff 3 10` |
+
+### History and application commands
+
+| Command | Description |
+|---|---|
+| `help` | Displays available commands and usage instructions. |
+| `history` | Displays the calculation history. |
+| `last` | Displays the most recent calculation. |
+| `clear` | Clears the calculation history. |
+| `undo` | Reverts the most recent calculation. |
+| `redo` | Restores a previously undone calculation. |
+| `save` | Manually saves calculation history to a CSV file. |
+| `load` | Loads calculation history from the saved CSV file. |
+| `exit` | Saves history as configured and exits the application. |
+
+The interface uses color-coded messages to make prompts, successful calculations, warnings, and errors easier to distinguish.
+
+### Error handling
+
+The calculator validates user input and displays appropriate error messages when an operation cannot be completed.
+
+## Logging
+
+The application uses Python's built-in `logging` module to record important application events and errors.
+
+### Log file location
+
+By default, log output is stored in:
+
+```text
+logs/calculator.log
+```
+
+The log directory and file location can be configured through the application's configuration settings and supported environment variables.
+
+### Log contents
+
+The log records events such as:
+
+- Calculator initialization.
+- Logging initialization.
+- Operation selection and calculation activity.
+- History management and saving.
+- Warnings and errors encountered during execution.
+
+Log entries use timestamps, severity levels, and descriptive messages to help with troubleshooting.
+
+The application configures logging at the INFO level. The log directory is created automatically when necessary.
+
+## Testing Instructions
+
+The project uses pytest for unit testing and pytest-cov for measuring test coverage.
+
+### Run the full test suite
+
+With the virtual environment activated, run:
 
 ```bash
-python main.py
+pytest
 ```
 
-(or update this if the main script is different.)
+This executes the project's unit tests and reports any failures.
 
-- **With Docker**:
+### Run tests with coverage
+
+To measure coverage for the application code, run:
 
 ```bash
-docker run -it --rm <image-name>
-```
-
----
-
-# 📝 7. Submission Instructions
-
-After finishing your work:
-
-```bash
-git add .
-git commit -m "Complete Module X"
-git push origin main
-```
-
-Then submit the GitHub repository link as instructed.
-
----
-
-# 🔥 Useful Commands Cheat Sheet
-
-| Action                         | Command                                          |
-| ------------------------------- | ------------------------------------------------ |
-| Install Homebrew (Mac)          | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
-| Install Git                     | `brew install git` or Git for Windows installer |
-| Configure Git Global Username  | `git config --global user.name "Your Name"`      |
-| Configure Git Global Email     | `git config --global user.email "you@example.com"` |
-| Clone Repository                | `git clone <repo-url>`                          |
-| Create Virtual Environment     | `python3 -m venv venv`                           |
-| Activate Virtual Environment   | `source venv/bin/activate` / `venv\Scripts\activate.bat` |
-| Install Python Packages        | `pip install -r requirements.txt`               |
-| Build Docker Image              | `docker build -t <image-name> .`                |
-| Run Docker Container            | `docker run -it --rm <image-name>`               |
-| Push Code to GitHub             | `git add . && git commit -m "message" && git push` |
-
----
-
-# 📋 Notes
-
-- Install **Homebrew** first on Mac.
-- Install and configure **Git** and **SSH** before cloning.
-- Use **Python 3.10+** and **virtual environments** for Python projects.
-- **Docker** is optional depending on the project.
-
----
-
-# 📎 Quick Links
-
-- [Homebrew](https://brew.sh/)
-- [Git Downloads](https://git-scm.com/downloads)
-- [Python Downloads](https://www.python.org/downloads/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [GitHub SSH Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+pytest --cov=app --cov-report=term-missing
+``
